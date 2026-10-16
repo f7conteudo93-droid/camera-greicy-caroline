@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Greicy Caroline - Esmalterapia</title>
+    <style>
+        :root {
+            --dourado: #D4AF37;
+            --dourado-claro: #F3E5AB;
+            --fundo: #FAFAFA;
+            --texto: #333333;
+            --branco: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--fundo);
+            color: var(--texto);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            font-weight: 300;
+            color: var(--texto);
+            letter-spacing: 1px;
+        }
+
+        header h1 span {
+            font-weight: 600;
+            color: var(--dourado);
+        }
+
+        #camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            height: 70vh;
+            background-color: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            flex-grow: 1;
+        }
+
+        #canvas {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #000;
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 0 20px;
+            z-index: 10;
+        }
+
+        .btn {
+            background-color: var(--branco);
+            border: 2px solid var(--dourado);
+            color: var(--texto);
+            border-radius: 50px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-decoration: none;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            padding: 0;
+            font-size: 1.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--dourado);
+            color: var(--branco);
+            border-color: var(--dourado);
+            width: 70px;
+            height: 70px;
+            font-size: 1.8rem;
+        }
+
+        #preview-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: none; /* Inicia oculto */
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+            padding: 0 20px;
+        }
+
+        .row-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .row-btns .btn {
+            flex: 1;
+            max-width: 150px;
+            font-size: 0.9rem;
+        }
+
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            z-index: 20;
+        }
+
+        /* Ajustes para telas menores */
+        @media (max-width: 380px) {
+            #camera-container {
+                height: 65vh;
+            }
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            .btn-primary {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Greicy <span>Caroline</span></h1>
+        <p style="font-size: 0.75rem; letter-spacing: 2px; color: #777; text-transform: uppercase; margin-top: 5px;">Esmalterapia</p>
+    </header>
+
+    <div id="camera-container">
+        <!-- Elemento de vídeo para a câmera ao vivo -->
+        <video id="video" autoplay playsinline></video>
+        
+        <!-- Canvas oculto para processar a foto final -->
+        <canvas id="canvas"></canvas>
+
+        <!-- Controles da Câmera (Captura) -->
+        <div id="controls">
+            <button class="btn btn-icon" id="switch-btn" title="Alternar câmera">&#128260;</button>
+            <button class="btn btn-primary" id="capture-btn" title="Tirar Foto">&#128247;</button>
+        </div>
+
+        <!-- Controles de Visualização (Após tirar a foto) -->
+        <div id="preview-controls">
+            <div class="row-btns">
+                <button class="btn" id="retake-btn">&#10006; Refazer</button>
+                <button class="btn" id="download-btn">&#11015; Baixar</button>
+            </div>
+            <div class="row-btns" style="width: 100%;">
+                <button class="btn" id="share-btn" style="max-width: 100%; width: 100%; background-color: var(--dourado); color: white; border-color: var(--dourado);">&#10148; Compartilhar</button>
+            </div>
+        </div>
+
+        <div id="loading">Processando imagem...</div>
+    </div>
+
+    <script>
+        // Elementos do DOM
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const switchBtn = document.getElementById('switch-btn');
+        const captureBtn = document.getElementById('capture-btn');
+        const retakeBtn = document.getElementById('retake-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const shareBtn = document.getElementById('share-btn');
+        const controls = document.getElementById('controls');
+        const previewControls = document.getElementById('preview-controls');
+        const loading = document.getElementById('loading');
+
+        // Variáveis de estado
+        let stream = null;
+        let facingMode = 'environment'; // 'environment' (traseira) ou 'user' (frontal)
+        let capturedImageBlob = null;
+        let watermarkImage = new Image();
+        
+        // Caminho da imagem da marca d'água. 
+        // Certifique-se de que o arquivo esteja na mesma pasta com este nome exato.
+        watermarkImage.src = 'marca-dagua.png'; 
+        
+        // Tratamento de erro caso a imagem não seja encontrada
+        watermarkImage.onerror = function() {
+            console.warn("Aviso: A imagem da marca d'água 'marca-dagua.png' não foi encontrada. A foto será gerada sem a marca d'água, mas com o Instagram.");
+        };
+
+        // Inicializa a câmera
+        async function initCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            const constraints = {
+                video: {
+                    facingMode: facingMode,
+                    width: { ideal: 1080 },
+                    height: { ideal: 1920 }
+                },
+                audio: false
+            };
+
+            try {
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                video.style.display = 'block';
+                canvas.style.display = 'none';
+                controls.style.display = 'flex';
+                previewControls.style.display = 'none';
+            } catch (error) {
+                console.error("Erro ao acessar a câmera:", error);
+                alert("Não foi possível acessar a câmera. Verifique se você deu permissão e se está usando HTTPS.");
+            }
+        }
+
+        // Alternar câmera
+        switchBtn.addEventListener('click', () => {
+            facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            initCamera();
+        });
+
+        // Tirar foto
+        captureBtn.addEventListener('click', () => {
+            loading.style.display = 'flex';
+            
+            // Aguarda um pequeno delay para garantir que o frame do vídeo esteja pronto
+            setTimeout(() => {
+                const videoWidth = video.videoWidth;
+                const videoHeight = video.videoHeight;
+
+                // Define o tamanho do canvas para a resolução do vídeo
+                canvas.width = videoWidth;
+                canvas.height = videoHeight;
+
+                // Desenha o frame atual do vídeo no canvas
+                // Espelha a imagem se for a câmera frontal
+                if (facingMode === 'user') {
+                    ctx.translate(videoWidth, 0);
+                    ctx.scale(-1, 1);
+                }
+                ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reseta a transformação
+
+                // Aplica a marca d'água (Imagem + Texto)
+                applyWatermark(videoWidth, videoHeight);
+
+                // Converte o canvas para Blob (JPEG)
+                canvas.toBlob((blob) => {
+                    capturedImageBlob = blob;
+                    
+                    // Exibe a imagem no canvas e esconde o vídeo
+                    video.style.display = 'none';
+                    canvas.style.display = 'block';
+                    controls.style.display = 'none';
+                    previewControls.style.display = 'flex';
+                    loading.style.display = 'none';
+
+                }, 'image/jpeg', 0.95);
+            }, 150);
+        });
+
+        // Função para desenhar a marca d'água (Imagem + Instagram)
+        function applyWatermark(w, h) {
+            // Desenha a imagem da marca d'água se estiver carregada
+            if (watermarkImage.complete && watermarkImage.naturalWidth > 0) {
+                // Define o tamanho da marca d'água (ex: 25% da largura da imagem)
+                const logoWidth = w * 0.25;
+                const logoHeight = (watermarkImage.naturalHeight / watermarkImage.naturalWidth) * logoWidth;
+                
+                // Posição: canto inferior direito, com margem
+                const x = w - logoWidth - (w * 0.05);
+                const y = h - logoHeight - (h * 0.05);
+                
+                // Desenha a imagem
+                ctx.drawImage(watermarkImage, x, y, logoWidth, logoHeight);
+            }
+
+            // Desenha o Instagram sempre
+            const instaText = "@greicycaroline";
+            const fontSize = w * 0.035; // Tamanho da fonte proporcional à largura
+            ctx.font = `600 ${fontSize}px 'Segoe UI', Roboto, sans-serif`;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.85)"; // Branco levemente transparente
+            ctx.textAlign = "right";
+            ctx.textBaseline = "bottom";
+            
+            // Adiciona uma sombra para dar legibilidade sobre qualquer fundo
+            ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+
+            // Posiciona o texto no canto inferior esquerdo
+            const textX = w - (w * 0.05);
+            const textY = h - (h * 0.03);
+            
+            ctx.fillText(instaText, textX, textY);
+
+            // Reseta a sombra
+            ctx.shadowColor = "transparent";
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        }
+
+        // Refazer (Voltar para a câmera)
+        retakeBtn.addEventListener('click', () => {
+            capturedImageBlob = null;
+            initCamera(); // Reinicia a câmera
+        });
+
+        // Baixar imagem
+        downloadBtn.addEventListener('click', () => {
+            if (!capturedImageBlob) return;
+            const url = URL.createObjectURL(capturedImageBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `GreicyCaroline_${new Date().getTime()}.jpg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Compartilhar imagem
+        shareBtn.addEventListener('click', async () => {
+            if (!capturedImageBlob) return;
+            
+            const file = new File([capturedImageBlob], 'unhas-greicy-caroline.jpg', { type: 'image/jpeg' });
+            
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Minhas Unhas - Greicy Caroline',
+                        text: 'Confira como ficaram minhas unhas! 💅✨'
+                    });
+                } catch (error) {
+                    console.log('Compartilhamento cancelado ou falhou:', error);
+                }
+            } else {
+                // Fallback para navegadores que não suportam compartilhamento de arquivos (ex: alguns Androids antigos)
+                alert("Seu navegador não suporta o compartilhamento direto de imagens. Por favor, use o botão 'Baixar' e compartilhe pelo Instagram ou WhatsApp.");
+            }
+        });
+
+        // Inicia a câmera assim que a página carregar
+        window.addEventListener('load', initCamera);
+
+        // Garante que a câmera seja desligada se a página for fechada
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+</body>
+</html>
