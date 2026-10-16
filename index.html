@@ -345,16 +345,19 @@
             }
 
             // Desenha o Instagram sempre
-            const instaText = "@greicycaroline";
-           const fontSize = w * 0.045;
+const instaText = "@greicycaroline";
+const fontSize = w * 0.045;
+
 ctx.font = `${fontSize}px "Great Vibes"`;
-ctx.fillStyle = "#D4AF37";
-            
-            // Adiciona uma sombra para dar legibilidade sobre qualquer fundo
-            ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
-            ctx.shadowBlur = 4;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
+ctx.fillStyle = "#FFFFFF";
+ctx.textAlign = "right";
+ctx.textBaseline = "bottom";
+
+// Sombra para melhorar a leitura
+ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+ctx.shadowBlur = 4;
+ctx.shadowOffsetX = 2;
+ctx.shadowOffsetY = 2;
 
             // Posiciona o texto no canto inferior esquerdo
             const textX = w - (w * 0.05);
