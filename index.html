@@ -336,10 +336,9 @@
                 const logoWidth = w * 0.25;
                 const logoHeight = (watermarkImage.naturalHeight / watermarkImage.naturalWidth) * logoWidth;
                 
-                // Posição: canto inferior direito, com margem
-                const x = w - logoWidth - (w * 0.05);
-                const y = h - logoHeight - (h * 0.05);
-                
+             // Posição: canto inferior direito, um pouco mais acima
+const x = w - logoWidth - (w * 0.05);
+const y = h - logoHeight - (h * 0.08);
                 // Desenha a imagem
                 ctx.drawImage(watermarkImage, x, y, logoWidth, logoHeight);
             }
