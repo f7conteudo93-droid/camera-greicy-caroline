@@ -2,9 +2,12 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Greicy Caroline - Esmalterapia</title>
-    <style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Greicy Caroline - Esmalterapia</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
         :root {
             --dourado: #D4AF37;
             --dourado-claro: #F3E5AB;
@@ -343,11 +346,9 @@
 
             // Desenha o Instagram sempre
             const instaText = "@greicycaroline";
-            const fontSize = w * 0.035; // Tamanho da fonte proporcional à largura
-            ctx.font = `600 ${fontSize}px 'Segoe UI', Roboto, sans-serif`;
-            ctx.fillStyle = "rgba(255, 255, 255, 0.85)"; // Branco levemente transparente
-            ctx.textAlign = "right";
-            ctx.textBaseline = "bottom";
+           const fontSize = w * 0.045;
+ctx.font = `${fontSize}px "Great Vibes"`;
+ctx.fillStyle = "#D4AF37";
             
             // Adiciona uma sombra para dar legibilidade sobre qualquer fundo
             ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
