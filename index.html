@@ -343,27 +343,7 @@ const y = h - logoHeight - (h * 0.10);
                 ctx.drawImage(watermarkImage, x, y, logoWidth, logoHeight);
             }
 
-            // Desenha o Instagram sempre
-const instaText = "@greicycaroline";
-const fontSize = w * 0.045;
-
-ctx.font = `${fontSize}px "Dancing Script"`;
-ctx.fillStyle = "#FFFFFF";
-ctx.textAlign = "right";
-ctx.textBaseline = "bottom";
-
-// Sombra para melhorar a leitura
-ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
-ctx.shadowBlur = 4;
-ctx.shadowOffsetX = 2;
-ctx.shadowOffsetY = 2;
-
-            // Posiciona o texto no canto inferior esquerdo
-            const textX = w - (w * 0.05);
-            const textY = h - (h * 0.03);
-            
-            ctx.fillText(instaText, textX, textY);
-
+           
             // Reseta a sombra
             ctx.shadowColor = "transparent";
             ctx.shadowBlur = 0;
